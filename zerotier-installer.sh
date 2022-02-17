@@ -5,7 +5,7 @@ ZT_BASE_URL_HTTP='http://download.zerotier.com/'
 
 ICON_EMOJI=:man-lifting-weights:
 HOSTNAME=$(hostname)
-LOCALIP=$(ip addr show ens160 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+LOCALIP=$(ip addr show | grep "inet " | grep -v "127.0.0.1/8" | awk '{print $2}')
 
 if [ -n "$SLACK_WEBHOOK_URL" ]; then
   pip install slack-webhook-cli
@@ -79,19 +79,97 @@ Awqahjkq87yxOYYTnJmr2OZtQuFboymfMhNqj3G2DYmZ/ZIXXPgwHx0fnd3R0Q==
 END_OF_KEY
 echo '-----END PGP PUBLIC KEY BLOCK-----' >>/tmp/zt-gpg-key
 
-echo "deb ${ZT_BASE_URL_HTTP}debian/xenial xenial main" >/tmp/zt-sources-list
+if [ -f /etc/debian_version ]; then
+	dvers=`cat /etc/debian_version | cut -d '.' -f 1 | cut -d '/' -f 1`
+	$SUDO rm -f /tmp/zt-sources-list
 
-$SUDO mv -f /tmp/zt-sources-list /etc/apt/sources.list.d/zerotier.list
-$SUDO chown 0 /etc/apt/sources.list.d/zerotier.list
-$SUDO chgrp 0 /etc/apt/sources.list.d/zerotier.list
-$SUDO apt-key add /tmp/zt-gpg-key
-$SUDO apt-get update
-$SUDO apt-get install -y zerotier-one
-$SUDO rm -f /tmp/zt-gpg-key
+	if [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F trusty`" ]; then
+		# Ubuntu 'trusty'
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/trusty trusty main" >/tmp/zt-sources-list
+	elif [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F wily`" ]; then
+		# Ubuntu 'wily'
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/wily wily main" >/tmp/zt-sources-list
+	elif [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F xenial`" ]; then
+		# Ubuntu 'xenial'
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/xenial xenial main" >/tmp/zt-sources-list
+	elif [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F zesty`" ]; then
+		# Ubuntu 'zesty'
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/zesty zesty main" >/tmp/zt-sources-list
+	elif [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F precise`" ]; then
+		# Ubuntu 'precise'
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/precise precise main" >/tmp/zt-sources-list
+	elif [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F artful`" ]; then
+		# Ubuntu 'artful'
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/artful artful main" >/tmp/zt-sources-list
+	elif [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F bionic`" ]; then
+		# Ubuntu 'bionic'
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/bionic bionic main" >/tmp/zt-sources-list
+	elif [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F yakkety`" ]; then
+		# Ubuntu 'yakkety'
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/yakkety yakkety main" >/tmp/zt-sources-list
+	elif [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F disco`" ]; then
+		# Ubuntu 'disco'
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/disco disco main" >/tmp/zt-sources-list
+	elif [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F focal`" ]; then
+		# Ubuntu 'focal' -> Ubuntu 'bionic' (for now)
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/bionic bionic main" >/tmp/zt-sources-list
+	elif [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F hirsute`" ]; then
+		# Ubuntu 'hirsute' -> Ubuntu 'bionic' (for now)
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/bionic bionic main" >/tmp/zt-sources-list
+	elif [ -f /etc/lsb-release -a -n "`cat /etc/lsb-release 2>/dev/null | grep -F impish`" ]; then
+		# Ubuntu 'impish' -> Ubuntu 'bionic' (for now)
+		echo '*** Found Ubuntu, creating /etc/apt/sources.list.d/zerotier.list'
+		echo "deb ${ZT_BASE_URL_HTTP}debian/bionic bionic main" >/tmp/zt-sources-list
+  fi
+
+  $SUDO mv -f /tmp/zt-sources-list /etc/apt/sources.list.d/zerotier.list
+  $SUDO chown 0 /etc/apt/sources.list.d/zerotier.list
+  $SUDO chgrp 0 /etc/apt/sources.list.d/zerotier.list
+  $SUDO apt-key add /tmp/zt-gpg-key
+  
+  echo
+	echo '*** Installing zerotier-one package...'
+  
+  $SUDO apt-get update
+  $SUDO apt-get install -y zerotier-one
+  $SUDO rm -f /tmp/zt-gpg-key
+fi
+
+$SUDO systemctl enable zerotier-one
+$SUDO systemctl start zerotier-one
+if [ "$?" != "0" ]; then
+  echo
+  echo '*** Package installed but cannot start service! You may be in a Docker'
+  echo '*** container or using a non-standard init service.'
+  echo
+  exit 1
+fi
+
+echo
+echo '*** Waiting for identity generation...'
+
+while [ ! -f /var/lib/zerotier-one/identity.secret ]; do
+	sleep 1
+done
+
+echo
+echo "*** Success! You are ZeroTier address [ `cat /var/lib/zerotier-one/identity.public | cut -d : -f 1` ]."
+echo
 
 zerotier-cli join $ZTNETWORK 
-zerotier-cli -j info > zt-info
-ZTADDRESS=$(cat zt-info|jq ".address"| tr -d '"')
+#zerotier-cli -j info > zt-info
+ZTADDRESS=$(zerotier-cli -j info|jq ".address"| tr -d '"')
 if [ -n "$SLACK_WEBHOOK_URL" ]; then slack -u $HOSTNAME -e $ICON_EMOJI "My ZeroTier address is $ZTADDRESS" ; fi
 curl -H "Authorization: bearer $ZTAPI" -H "Content-Type: application/json" -X POST -d '{ "config":{ "authorized": true } }' https://my.zerotier.com/api/network/$ZTNETWORK/member/$ZTADDRESS
 curl -H "Authorization: bearer $ZTAPI" -H "Content-Type: application/json" -X POST -d '{ "name":"'$(hostname)'" }' https://my.zerotier.com/api/network/$ZTNETWORK/member/$ZTADDRESS
@@ -101,7 +179,7 @@ curl -H "Authorization: bearer $ZTAPI" -H "Content-Type: application/json" -X PO
 COUNTER=9
 
 while [  $COUNTER -gt 0 ] && [ -z "$ZTIP" ]; do
-  ZTIP=$(ip addr show zt0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+  ZTIP=$(zerotier-cli get $ZTNETWORK ip4)
   if [ -n "$ZTIP" ]; then
     if [ -n "$SLACK_WEBHOOK_URL" ]; then slack -u $HOSTNAME -e $ICON_EMOJI "My ZeroTier IP is $ZTIP. VM customization Complete." ; fi
     echo ZeroTier IP: $ZTIP
@@ -114,5 +192,7 @@ if [ -z "$ZTIP" ]; then
   if [ -n "$SLACK_WEBHOOK_URL" ]; then slack -u $HOSTNAME -e $ICON_EMOJI "Could not determine ZeroTier IP. VM customization complete." ; fi
 fi
 
-rm zt-info
-rm zt-member
+#rm zt-info
+#rm zt-member
+
+exit 0
