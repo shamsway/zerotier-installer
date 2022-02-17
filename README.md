@@ -1,7 +1,7 @@
 # zerotier-installer
-Simple bash script will install and configure ZeroTier on Ubuntu. This is for demo/PoC use only.
+Simple bash script to install and configure ZeroTier on Ubuntu. This is for demo/PoC use only.
 
-The following variables must be set before running the script
+The following variables must be set before running the script:
 * `ZTAPI` = ZeroTier API Key
 * `ZTNETWORK` = Network to join member node to
 
