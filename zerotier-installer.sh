@@ -168,13 +168,10 @@ echo "*** Success! You are ZeroTier address [ `cat /var/lib/zerotier-one/identit
 echo
 
 zerotier-cli join $ZTNETWORK 
-#zerotier-cli -j info > zt-info
 ZTADDRESS=$(zerotier-cli -j info|jq ".address"| tr -d '"')
 if [ -n "$SLACK_WEBHOOK_URL" ]; then slack -u $HOSTNAME -e $ICON_EMOJI "My ZeroTier address is $ZTADDRESS" ; fi
 curl -H "Authorization: bearer $ZTAPI" -H "Content-Type: application/json" -X POST -d '{ "config":{ "authorized": true } }' https://my.zerotier.com/api/network/$ZTNETWORK/member/$ZTADDRESS
 curl -H "Authorization: bearer $ZTAPI" -H "Content-Type: application/json" -X POST -d '{ "name":"'$(hostname)'" }' https://my.zerotier.com/api/network/$ZTNETWORK/member/$ZTADDRESS
-#curl -H "Authorization: bearer $ZTAPI" https://my.zerotier.com/api/network/$ZTNETWORK/member/$ZTADDRESS > zt-member
-#ZTIP=$(cat zt-member | jq ".config.ipAssignments" | tr -d '[]" \n')
 
 COUNTER=9
 
@@ -191,8 +188,5 @@ done
 if [ -z "$ZTIP" ]; then
   if [ -n "$SLACK_WEBHOOK_URL" ]; then slack -u $HOSTNAME -e $ICON_EMOJI "Could not determine ZeroTier IP. VM customization complete." ; fi
 fi
-
-#rm zt-info
-#rm zt-member
 
 exit 0
